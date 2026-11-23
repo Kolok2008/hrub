@@ -1,4 +1,5 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Mushroom Hollow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,500;0,700;0,800;1,500&family=Manrope:wght@400;600;700&display=swap">
@@ -67,6 +68,11 @@ background:linear-gradient(90deg,rgba(18,11,6,.82) 0%,rgba(18,11,6,.45) 42%,rgba
 #debuffs{position:absolute;bottom:max(64px,env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:min(640px,90vw)}
 .db{background:var(--glass);border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700}.db.bad{color:#ff9a80}.db.warn{color:var(--gold)}
 .up.eq{border-color:var(--rust);background:rgba(180,82,30,.08)}
+.storyCard{width:min(560px,100%);max-height:88vh;overflow:auto}
+.storyCard .page{font-family:var(--display);font-style:italic;font-size:19px;line-height:1.5;margin:0 0 12px}
+#storyBtns{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.debt{margin-top:16px;padding:12px;border:1px dashed rgba(180,82,30,.6);border-radius:6px;display:flex;gap:12px;align-items:center;justify-content:space-between}
+.debt p{margin:2px 0 0;font-size:13px;opacity:.75}.debt .btn.primary{width:auto}
 #hint{max-width:40vw;position:absolute;bottom:max(18px,env(safe-area-inset-bottom,0px));right:max(18px,env(safe-area-inset-right,0px));font-size:12px;opacity:.6;text-align:right;line-height:1.7}
 kbd{font-family:var(--body);font-size:11px;font-weight:700;border:1px solid rgba(241,230,204,.4);border-radius:4px;padding:0 5px}
 /* panels */
@@ -127,23 +133,25 @@ background-image:radial-gradient(rgba(120,80,30,.06) 1px,transparent 1px);backgr
 #tAtlas{right:max(70px,env(safe-area-inset-right,0px));top:max(60px,env(safe-area-inset-top,0px));width:44px;height:44px;font-size:12px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+  <script type="module" crossorigin src="./assets/index-B43UXt8M.js"></script>
+</head><body>
 <div id="app"></div>
 
 <div id="loading"><div><h1>Mushroom Hollow</h1><div class="bar"><div id="loadbar"></div></div><div id="loadmsg">Ліс прокидається…</div></div></div>
 
 <div id="menu" hidden><div class="menuInner">
   <h1>Mushroom<br>Hollow</h1>
-  <p class="sub">Грибник · осінній ліс, тиша й кошик</p>
+  <p class="sub">Спадок, борг і 30 днів в осінньому лісі</p>
   <button class="mbtn" id="mContinue">Продовжити <small id="mContinueDay"></small></button>
   <button class="mbtn" id="mNew">Нова гра</button>
   <button class="mbtn" id="mSettings">Налаштування</button>
   <button class="mbtn" id="mHow">Як грати</button>
-  <p class="menuFoot">Ходи стежкою або сходь у хащі. Чим далі від стежки, тим цінніші знахідки, але легше заблукати. Віднось гриби до скупки на початку стежки, поки не стемніло. Бережись вовків.</p>
+  <p class="menuFoot">Дід залишив тобі хатину й борг. Збирай гриби, знайди 10 сторінок його щоденника й дізнайся, що ховається в серці лісу. Ходи стежкою або сходь у хащі. Чим далі від стежки, тим цінніші знахідки, але легше заблукати. Віднось гриби до скупки на початку стежки, поки не стемніло. Бережись вовків.</p>
 </div></div>
 
 <div id="hud" hidden>
   <div class="hudTop">
-    <div class="chip"><span id="hudDay">День 1</span><span class="sep">·</span><span id="hudTime">07:00</span></div>
+    <div class="chip"><span id="hudDay">День 1</span><span class="sep">·</span><span id="hudTime">07:00</span><span class="sep">·</span><span id="hudDebt" style="color:#ffb08a"></span></div>
     <div class="chip"><span>Кошик <span id="hudBasket">0/12</span></span><span class="sep">·</span><span><span id="hudMoney">0</span> ₴</span></div>
   </div>
   <div id="compass" hidden><div class="needle"></div></div>
@@ -170,6 +178,7 @@ background-image:radial-gradient(rgba(120,80,30,.06) 1px,transparent 1px);backgr
 
 <div id="map" class="panel" hidden><div class="sheet" style="width:min(640px,100%)"><button class="close" id="mapClose" aria-label="Закрити">×</button>
   <div class="sheetHead"><h2>Карта лісу</h2><span class="money">Стрілка — це ти</span></div><div style="padding:16px 24px 24px"><canvas id="mapCanvas" width="560" height="560" style="width:100%;border-radius:4px;display:block"></canvas></div></div></div>
+<div id="story" class="panel" hidden><div class="menuCard storyCard"><h2 id="storyTitle"></h2><div id="storyBody"></div><div id="storyBtns"></div></div></div>
 <div id="pause" class="panel" hidden><div class="menuCard"><h2>Пауза</h2>
   <button class="mbtn" id="pResume">Продовжити</button><button class="mbtn" id="pAtlas">Атлас</button><button class="mbtn" id="pSettings">Налаштування</button><button class="mbtn" id="pMenu">Головне меню</button></div></div>
 
@@ -189,6 +198,4 @@ background-image:radial-gradient(rgba(120,80,30,.06) 1px,transparent 1px);backgr
 
 <div id="hurt"></div>
 <div id="fade"><div class="msg" id="fadeMsg"></div></div>
-<script type="module" crossorigin src="./assets/index-b9sUOk44.js"></script>
-
 </body></html>
